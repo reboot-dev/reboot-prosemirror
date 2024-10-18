@@ -1,0 +1,16 @@
+{
+  "name": "reboot-typescript-template",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:backend": "rbt dev run"
+  },
+  "dependencies": {
+    "@reboot-dev/reboot": "0.15.0",
+    "@reboot-dev/reboot-react": "0.15.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}

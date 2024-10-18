@@ -1,0 +1,47 @@
+########################################################################
+# To expand flags or positional arguments for a specific subcommand    #
+# you can include a line such as:                                      #
+#                                                                      #
+# subcommand --flag1 --flag2=value argument                            #
+#                                                                      #
+# You can also include one flag or argument per line:                  #
+#                                                                      #
+# subcommand --flag1                                                   #
+# subcommand --flag2=value                                             #
+# subcommand argument                                                  #
+#                                                                      #
+# To only expand flags or arguments if a specific config is used with  #
+# a subcommand include lines that include 'subcommand:config', for     #
+# example:                                                             #
+#                                                                      #
+# subcommand:use-foo --flag3=foo                                       #
+#                                                                      #
+# Then you can expand that config on the command line via:             #
+#                                                                      #
+# rbt subcommand --config=use-foo`                                     #
+########################################################################
+
+# Find '.proto' files in 'api/'.
+protoc api/
+
+# Tell `rbt protoc` where to put generated files.
+protoc --nodejs=api
+protoc --react=web/src/api
+
+# Don't use extensions for React generated files because webpack can't
+# handle them (https://github.com/TypeStrong/ts-loader/issues/465).
+protoc --react-extensionless
+
+# Watch if any generated or source files are modified.
+dev run --watch=backend/**/*.ts
+
+dev run --tsc='npx tsc'
+
+# Tell `rbt` that this is a Node.js application.
+dev run --nodejs
+
+# Save state between chaos restarts.
+dev run --name=app
+
+# Run the application!
+dev run dist/backend/src/main.js
