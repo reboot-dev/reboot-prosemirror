@@ -28,20 +28,19 @@ protoc api/
 protoc --nodejs=api
 protoc --react=web/src/api
 
-# Don't use extensions for React generated files because webpack can't
-# handle them (https://github.com/TypeStrong/ts-loader/issues/465).
-protoc --react-extensionless
-
 # Watch if any generated or source files are modified.
-dev run --watch=backend/**/*.ts
+dev run --watch=constants.ts --watch=backend/**/*.ts
 
-dev run --tsc='npx tsc'
+dev run --transpile='npx tsc'
 
 # Tell `rbt` that this is a Node.js application.
 dev run --nodejs
 
 # Save state between chaos restarts.
-dev run --name=app
+dev run --name=docs
 
 # Run the application!
 dev run dist/backend/src/main.js
+
+# Use the same name to expunge that we do to run.
+dev expunge --name=docs
