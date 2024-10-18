@@ -6,8 +6,10 @@
     "target": "es2020",
     "rootDir": ".",
     "outDir": "dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "incremental": true
   },
   "outDir": "dist",
-  "exclude": ["dist", "web"]
+  "exclude": ["node_modules", "dist", "web"]
 }

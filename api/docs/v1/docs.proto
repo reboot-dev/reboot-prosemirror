@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package docs.v1;
+
+import "rbt/v1alpha1/options.proto";
+
+////////////////////////////////////////////////////////////////////////
+
+service DocInterface {
+  rpc Create(CreateRequest) returns (CreateResponse) {
+    option (rbt.v1alpha1.method).writer = {};
+  }
+
+  rpc Apply(ApplyRequest) returns (ApplyResponse) {
+    option (rbt.v1alpha1.method).writer = {};
+  }
+
+  rpc Steps(StepsRequest) returns (StepsResponse) {
+    option (rbt.v1alpha1.method).reader = {};
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+message Doc {
+  option (rbt.v1alpha1.state) = {};
+  repeated Step steps = 1;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// TODO: rename `Step` so as not to conflict with the `Step` type from
+// 'prosemirror'.
+message Step {
+  string json = 1;  // TODO: use a `Struct` instead of a `string`.
+  string client = 2;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+message CreateRequest {}
+
+message CreateResponse {}
+
+////////////////////////////////////////////////////////////////////////
+
+message ApplyRequest {
+  uint32 version = 1;
+  repeated Step steps = 2;
+}
+
+message ApplyResponse {}
+
+////////////////////////////////////////////////////////////////////////
+
+message StepsRequest {
+  uint32 sinceVersion = 1;
+}
+
+message StepsResponse {
+  uint32 version = 1;
+  repeated Step steps = 2;
+}
+
+////////////////////////////////////////////////////////////////////////
