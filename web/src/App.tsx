@@ -1,23 +1,46 @@
-import { ProseMirror, useEditorEffect } from "@nytimes/react-prosemirror";
+import { ProseMirror, useEditorEffect, useEditorState } from "@nytimes/react-prosemirror";
 import { collab, getVersion, sendableSteps, receiveTransaction } from "prosemirror-collab";
 import { EditorState } from "prosemirror-state";
 import { Step } from "prosemirror-transform"
-import { MutableRefObject, ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { useDoc } from "./api/docs/v1/docs_rbt_react";
 import { SCHEMA, INITIAL_DOC, DOC_ID } from "../../constants";
 
-function RebootProseMirrorUseSteps({
-  waitingForVersion,
-  children
-}: {
-  waitingForVersion: MutableRefObject<undefined | number>,
-  children: ReactNode
-}) {
+function RebootProseMirrorAdaptor({ children }: { children: ReactNode }) {
   // NOTE: while we could also drill `doc` in as a prop the Reboot
   // React library and generated code will ensure there is only
   // one instance of `doc` so it's not actually necessary.
   const doc = useDoc({ id: DOC_ID });
 
+  // In order to send steps to the server (authority) we reactively
+  // watch for updates to the state to see if we have anything
+  // sendable and if we're not currently sending we send.
+  const state = useEditorState();
+
+  // Track if we're currently sending.
+  const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    if (!sending) {
+      let sendable = sendableSteps(state);
+      if (sendable) {
+        setSending(true);
+        doc.apply({
+          version: sendable.version,
+          steps: sendable.steps.map(
+            (step) => ({
+              json: JSON.stringify(step.toJSON()),
+              client: `${sendable.clientID}`
+            })
+          )
+        }).finally(() => { setSending(false); });
+      }
+    }
+  }, [state, sending]);
+
+  // In order to receive steps from the server (authority) we reactively
+  // listen for steps via `doc.useSteps(...)` and then pass those steps
+  // on to the view as a transaction.
   const [sinceVersion, setSinceVersion] = useState(0);
 
   const { response } = doc.useSteps({ sinceVersion });
@@ -26,16 +49,12 @@ function RebootProseMirrorUseSteps({
     if (response !== undefined) {
       const { version, steps } = response;
 
-      // Toggle if we've received the version we're waiting for so that
-      // we can resume trying to apply our transactions on the server.
-      if (waitingForVersion.current === version + steps.length) {
-        waitingForVersion.current = undefined;
-      }
-
       // Get out only the steps that we haven't applied locally.
       //
-      // TODO: are we misunderstanding `prosemirror` and should we
-      // not need to do this?
+      // We need to do this because `doc.useSteps(...)` might get
+      // another response before we've called `setSinceVersion(...)`
+      // and thus we might get steps we've already applied which
+      // ProseMirror can't seem to handle.
       const unappliedSteps = steps.slice(getVersion(view.state) - version);
 
       if (unappliedSteps.length > 0) {
@@ -63,7 +82,7 @@ function RebootProseMirrorUseSteps({
 function RebootProseMirror() {
   const [mount, setMount] = useState<HTMLElement | null>(null);
 
-  const [state, setState] = useState(() => {
+  const defaultState = useMemo(() => {
     return EditorState.create({
       SCHEMA,
       // TODO: actually get the `doc` and its `version` from
@@ -73,47 +92,12 @@ function RebootProseMirror() {
     });
   });
 
-  // Ref for tracking what version we are waiting to see before we can
-  // start sending the next transaction to the server.
-  const waitingForVersion = useRef(undefined);
-
-  const doc = useDoc({ id: DOC_ID });
-
-  function dispatchTransaction(tr): void {
-    setState((state) => {
-      let newState = state.apply(tr);
-      // TODO: use the following once we've fixed bug #2989.
-      // if (doc.apply.pending.length === 0) {
-      if (waitingForVersion.current === undefined) {
-        let sendable = sendableSteps(newState);
-        if (sendable) {
-          waitingForVersion.current = sendable.version + sendable.steps.length;
-          doc.apply({
-            version: sendable.version,
-            steps: sendable.steps.map(
-              (step) => ({
-                json: JSON.stringify(step.toJSON()),
-                client: `${sendable.clientID}`
-              })
-            )
-          });
-        }
-      }
-
-      return newState;
-    });
-  }
-
   return (
     <>
-      <ProseMirror
-        mount={mount}
-        state={state}
-        dispatchTransaction={dispatchTransaction}
-      >
-        <RebootProseMirrorUseSteps waitingForVersion={waitingForVersion}>
+      <ProseMirror mount={mount} defaultState={defaultState}>
+        <RebootProseMirrorAdaptor>
           <div ref={setMount} />
-        </RebootProseMirrorUseSteps>
+        </RebootProseMirrorAdaptor>
       </ProseMirror>
     </>
   );
