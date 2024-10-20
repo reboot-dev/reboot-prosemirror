@@ -1,5 +1,5 @@
 import { Struct } from "@bufbuild/protobuf";
-import { ProseMirror, useEditorEffect, useEditorState } from "@nytimes/react-prosemirror";
+import { ProseMirror, ProseMirrorProps, useEditorEffect, useEditorState } from "@nytimes/react-prosemirror";
 import { collab, getVersion, sendableSteps, receiveTransaction } from "prosemirror-collab";
 import { EditorState } from "prosemirror-state";
 import { Step } from "prosemirror-transform"
@@ -80,7 +80,19 @@ function RebootProseMirrorAdaptor({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-function RebootProseMirror() {
+function RebootProseMirror({ children, ...props }: ProseMirrorProps) {
+  return (
+    <>
+      <ProseMirror {...props}>
+        <RebootProseMirrorAdaptor>
+          {children}
+        </RebootProseMirrorAdaptor>
+      </ProseMirror>
+    </>
+  );
+}
+
+export function App() {
   const [mount, setMount] = useState<HTMLElement | null>(null);
 
   const defaultState = useMemo(() => {
@@ -94,19 +106,9 @@ function RebootProseMirror() {
   });
 
   return (
-    <>
-      <ProseMirror mount={mount} defaultState={defaultState}>
-        <RebootProseMirrorAdaptor>
-          <div ref={setMount} />
-        </RebootProseMirrorAdaptor>
-      </ProseMirror>
-    </>
-  );
-}
-
-export function App() {
-  return (
-    <RebootProseMirror />
+    <RebootProseMirror mount={mount} defaultState={defaultState}>
+      <div ref={setMount} />
+    </RebootProseMirror>
   );
 }
 
