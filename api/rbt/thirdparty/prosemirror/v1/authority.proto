@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package docs.v1;
+package rbt.thirdparty.prosemirror.v1;
 
 import "google/protobuf/struct.proto";
 import "rbt/v1alpha1/options.proto";
 
 ////////////////////////////////////////////////////////////////////////
 
-service DocInterface {
+service AuthorityInterface {
   rpc Create(CreateRequest) returns (CreateResponse) {
     option (rbt.v1alpha1.method).writer = {};
   }
@@ -23,7 +23,7 @@ service DocInterface {
 
 ////////////////////////////////////////////////////////////////////////
 
-message Doc {
+message Authority {
   option (rbt.v1alpha1.state) = {};
   repeated Change changes = 1;
 }

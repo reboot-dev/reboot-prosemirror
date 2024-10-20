@@ -6,16 +6,16 @@ import { Step } from "prosemirror-transform"
 import {
   ApplyRequest,
   ApplyResponse,
-  Doc,
+  Authority,
   CreateRequest,
   CreateResponse,
   ChangesRequest,
   ChangesResponse
-} from "../../api/docs/v1/docs_rbt.js";
+} from "../../api/rbt/thirdparty/prosemirror//v1/authority_rbt.js";
 import { SCHEMA, INITIAL_DOC, DOC_ID } from "../../constants.js";
 
 
-export class DocServicer extends Doc.Interface {
+export class AuthorityServicer extends Authority.Interface {
 
   #docs: { [key: string]: [number, Node] };
 
@@ -24,7 +24,7 @@ export class DocServicer extends Doc.Interface {
     this.#docs = {};
   }
 
-  private doc(stateId: string, state: Doc.State) {
+  private doc(stateId: string, state: Authority.State) {
     // Hydrate the doc or return an already hydrated doc if there are
     // no outstanding changes in the latest `state` that need to be
     // hydrated.
@@ -52,7 +52,7 @@ export class DocServicer extends Doc.Interface {
 
   async create(
     context: WriterContext,
-    state: Doc.State,
+    state: Authority.State,
     request: CreateRequest
   ): Promise<PartialMessage<CreateResponse>> {
     // TODO: get the hydrated doc and return it as JSON
@@ -63,11 +63,11 @@ export class DocServicer extends Doc.Interface {
 
   async apply(
     context: WriterContext,
-    state: Doc.State,
+    state: Authority.State,
     request: ApplyRequest
   ): Promise<PartialMessage<ApplyResponse>> {
     if (request.version != state.changes.length) {
-      throw new Doc.ApplyAborted(new FailedPrecondition());
+      throw new Authority.ApplyAborted(new FailedPrecondition());
     }
 
     // Validate that we can apply these changes!
@@ -101,11 +101,11 @@ export class DocServicer extends Doc.Interface {
 
   async changes(
     context: ReaderContext,
-    state: Doc.State,
+    state: Authority.State,
     { sinceVersion }: ChangesRequest
   ): Promise<PartialMessage<ChangesResponse>> {
     if (sinceVersion > state.changes.length) {
-      throw new Doc.ChangesAborted(new InvalidArgument());
+      throw new Authority.ChangesAborted(new InvalidArgument());
     }
     
     return {
@@ -116,7 +116,7 @@ export class DocServicer extends Doc.Interface {
 }
 
 const initialize = async (context) => {
-  await Doc.construct({ id: DOC_ID }).idempotently().create(context);
+  await Authority.construct({ id: DOC_ID }).idempotently().create(context);
 };
 
-new Application({ servicers: [DocServicer], initialize }).run();
+new Application({ servicers: [AuthorityServicer], initialize }).run();
