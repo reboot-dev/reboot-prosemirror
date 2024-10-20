@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package docs.v1;
 
+import "google/protobuf/struct.proto";
 import "rbt/v1alpha1/options.proto";
 
 ////////////////////////////////////////////////////////////////////////
@@ -15,7 +16,7 @@ service DocInterface {
     option (rbt.v1alpha1.method).writer = {};
   }
 
-  rpc Steps(StepsRequest) returns (StepsResponse) {
+  rpc Changes(ChangesRequest) returns (ChangesResponse) {
     option (rbt.v1alpha1.method).reader = {};
   }
 }
@@ -24,15 +25,17 @@ service DocInterface {
 
 message Doc {
   option (rbt.v1alpha1.state) = {};
-  repeated Step steps = 1;
+  repeated Change changes = 1;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-// TODO: rename `Step` so as not to conflict with the `Step` type from
-// 'prosemirror'.
-message Step {
-  string json = 1;  // TODO: use a `Struct` instead of a `string`.
+// A `Change` is a prosemirror `step` from a specific `client`.
+message Change {
+  // See prosemirror `Step` type.
+  google.protobuf.Struct step = 1;
+
+  // The client that authored this change.
   string client = 2;
 }
 
@@ -46,20 +49,20 @@ message CreateResponse {}
 
 message ApplyRequest {
   uint32 version = 1;
-  repeated Step steps = 2;
+  repeated Change changes = 2;
 }
 
 message ApplyResponse {}
 
 ////////////////////////////////////////////////////////////////////////
 
-message StepsRequest {
+message ChangesRequest {
   uint32 sinceVersion = 1;
 }
 
-message StepsResponse {
+message ChangesResponse {
   uint32 version = 1;
-  repeated Step steps = 2;
+  repeated Change changes = 2;
 }
 
 ////////////////////////////////////////////////////////////////////////

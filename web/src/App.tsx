@@ -1,3 +1,4 @@
+import { Struct } from "@bufbuild/protobuf";
 import { ProseMirror, useEditorEffect, useEditorState } from "@nytimes/react-prosemirror";
 import { collab, getVersion, sendableSteps, receiveTransaction } from "prosemirror-collab";
 import { EditorState } from "prosemirror-state";
@@ -27,9 +28,9 @@ function RebootProseMirrorAdaptor({ children }: { children: ReactNode }) {
         setSending(true);
         doc.apply({
           version: sendable.version,
-          steps: sendable.steps.map(
+          changes: sendable.steps.map(
             (step) => ({
-              json: JSON.stringify(step.toJSON()),
+              step: Struct.fromJson(step.toJSON()),
               client: `${sendable.clientID}`
             })
           )
@@ -39,25 +40,25 @@ function RebootProseMirrorAdaptor({ children }: { children: ReactNode }) {
   }, [state, sending]);
 
   // In order to receive steps from the server (authority) we reactively
-  // listen for steps via `doc.useSteps(...)` and then pass those steps
+  // listen for changes via `doc.useChanges(...)` and then pass those steps
   // on to the view as a transaction.
   const [sinceVersion, setSinceVersion] = useState(0);
 
-  const { response } = doc.useSteps({ sinceVersion });
+  const { response } = doc.useChanges({ sinceVersion });
 
   useEditorEffect((view) => {
     if (response !== undefined) {
-      const { version, steps } = response;
+      const { version, changes } = response;
 
       // Get out only the steps that we haven't applied locally.
       //
-      // We need to do this because `doc.useSteps(...)` might get
+      // We need to do this because `doc.useChanges(...)` might get
       // another response before we've called `setSinceVersion(...)`
       // and thus we might get steps we've already applied which
       // ProseMirror can't seem to handle.
-      const unappliedSteps = steps.slice(getVersion(view.state) - version);
+      const unappliedChanges = changes.slice(getVersion(view.state) - version);
 
-      if (unappliedSteps.length > 0) {
+      if (unappliedChanges.length > 0) {
         // TODO: calling `view.dispatch()` here seems to cause
         // 'Warning: flushSync was called from inside a lifecycle method';
         // what is the correct way to do this within the
@@ -65,10 +66,10 @@ function RebootProseMirrorAdaptor({ children }: { children: ReactNode }) {
         view.dispatch(
           receiveTransaction(
             view.state,
-            unappliedSteps.map(
-              ({ json }) => Step.fromJSON(SCHEMA, JSON.parse(json))
+            unappliedChanges.map(
+              ({ step }) => Step.fromJSON(SCHEMA, step.toJson())
             ),
-            unappliedSteps.map(({ client }) => Number(client))
+            unappliedChanges.map(({ client }) => Number(client))
           )
         );
         setSinceVersion(getVersion(view.state));
