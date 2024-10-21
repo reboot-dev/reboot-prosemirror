@@ -1,11 +1,12 @@
 import { Struct } from "@bufbuild/protobuf";
 import { ProseMirror, ProseMirrorProps, useEditorEffect, useEditorState } from "@nytimes/react-prosemirror";
 import { collab, getVersion, sendableSteps, receiveTransaction } from "prosemirror-collab";
+import { Node } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 import { Step } from "prosemirror-transform"
 import { ReactNode, useEffect, useMemo, useState } from "react";
-import { useAuthority } from "./api/rbt/thirdparty/prosemirror/v1/authority_rbt_react";
-import { SCHEMA, INITIAL_DOC, DOC_ID } from "../../constants";
+import { CreateResponse, useAuthority } from "./api/rbt/thirdparty/prosemirror/v1/authority_rbt_react";
+import { SCHEMA, DOC_ID } from "../../constants";
 
 function RebootProseMirrorAdaptor({ children }: { children: ReactNode }) {
   // NOTE: while we could also drill `authority` in as a prop the
@@ -80,10 +81,60 @@ function RebootProseMirrorAdaptor({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-function RebootProseMirror({ children, ...props }: ProseMirrorProps) {
+interface RebootProseMirrorProps extends ProseMirrorProps {
+  id: string
+
+  // Ensure that these aren't set.
+  defaultState?: undefined
+  state?: undefined
+}
+
+let haveLoggedAboutIncorrectUsage = false;
+
+function RebootProseMirror({ id, children, ...props }: RebootProseMirrorProps) {
+  // Log about incorrect usage (if we haven't done so already).
+  if (
+    (props.defaultState !== undefined || props.state !== undefined) &&
+    !haveLoggedAboutIncorrectUsage
+  ) {
+    console.error(
+      "Not expecting properties `defaultState` or `state` to be passed to " +
+        "`RebootProseMirror` as it is responsible for fetching your state " +
+        "via `id` instead",
+    );
+    haveLoggedAboutIncorrectUsage = true;
+  }
+
+  delete props.state;
+  delete props.defaultState;
+
+  const authority = useAuthority({ id });
+
+  const [doc, setDoc] = useState<Node>();
+  const [version, setVersion] = useState<number>();
+
+  useEffect(() => {
+    (async () => {
+      const { response, aborted } = await authority.create();
+      if (response) {
+        setDoc(Node.fromJSON(SCHEMA, response.doc.toJson()));
+        setVersion(response.version);
+      } else {
+        console.error(`Failed to get doc from authority: ${aborted.error}`);
+      }
+    })();
+  });
+
+  const defaultState = useMemo(() => {
+    if (!doc) return undefined;
+    return EditorState.create({ SCHEMA, doc, plugins: [collab({ version })] });
+  }, [doc, version]);
+
+  if (!doc) return <></>;
+
   return (
     <>
-      <ProseMirror {...props}>
+      <ProseMirror defaultState={defaultState} {...props}>
         <RebootProseMirrorAdaptor>
           {children}
         </RebootProseMirrorAdaptor>
@@ -95,18 +146,8 @@ function RebootProseMirror({ children, ...props }: ProseMirrorProps) {
 export function App() {
   const [mount, setMount] = useState<HTMLElement | null>(null);
 
-  const defaultState = useMemo(() => {
-    return EditorState.create({
-      SCHEMA,
-      // TODO: actually get the `doc` and its `version` from the
-      // server (authority) rather than starting with this "initial doc".
-      doc: INITIAL_DOC,
-      plugins: [collab({ version: 0 })]
-    });
-  });
-
   return (
-    <RebootProseMirror mount={mount} defaultState={defaultState}>
+    <RebootProseMirror id={DOC_ID} mount={mount}>
       <div ref={setMount} />
     </RebootProseMirror>
   );

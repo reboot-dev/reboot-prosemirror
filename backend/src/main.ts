@@ -1,7 +1,7 @@
-import { PartialMessage } from "@bufbuild/protobuf";
+import { PartialMessage, Struct } from "@bufbuild/protobuf";
 import { Application, ReaderContext, WriterContext } from "@reboot-dev/reboot";
 import { FailedPrecondition, InvalidArgument } from "@reboot-dev/reboot-api/errors_pb.js";
-import { Node, Schema } from "prosemirror-model";
+import { Node } from "prosemirror-model";
 import { Step } from "prosemirror-transform"
 import {
   ApplyRequest,
@@ -55,10 +55,10 @@ export class AuthorityServicer extends Authority.Interface {
     state: Authority.State,
     request: CreateRequest
   ): Promise<PartialMessage<CreateResponse>> {
-    // TODO: get the hydrated doc and return it as JSON
-    // so that we don't need to start from `INITIAL_DOC`
-    // in the frontend?
-    return {};
+    return {
+      doc: Struct.fromJson(this.doc(context.stateId, state).toJSON()),
+      version: state.changes.length
+    };
   }
 
   async apply(

@@ -43,7 +43,11 @@ message Change {
 
 message CreateRequest {}
 
-message CreateResponse {}
+message CreateResponse {
+  // See prosemirror `Node` type which is used to represent a "doc".
+  google.protobuf.Struct doc = 1;
+  uint32 version = 2;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
