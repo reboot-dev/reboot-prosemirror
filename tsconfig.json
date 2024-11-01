@@ -1,15 +1,4 @@
 {
-  "compilerOptions": {
-    "declaration": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "target": "es2020",
-    "rootDir": ".",
-    "outDir": "dist",
-    "sourceMap": true,
-    "skipLibCheck": true,
-    "incremental": true
-  },
-  "outDir": "dist",
-  "exclude": ["node_modules", "dist", "web"]
+	"files": [],
+	"references": [{ "path": "./reboot" }, { "path": "./web-app" }]
 }
