@@ -41,7 +41,7 @@ dev run --nodejs
 dev run --name=reboot-collab
 
 # Run the application!
-dev run --application=dist/backend/src/main.js
+dev run --application=dist/api/backend/src/main.js
 
 # Use the same name to expunge that we do to run.
 dev expunge --name=reboot-collab
