@@ -15,7 +15,7 @@ import {
 import { SCHEMA, INITIAL_DOC, DOC_ID } from "../../constants.js";
 
 
-export class AuthorityServicer extends Authority.Interface {
+export class AuthorityServicer extends Authority.Servicer {
 
   #docs: { [key: string]: [number, Node] };
 
