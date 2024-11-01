@@ -123,7 +123,7 @@ function RebootProseMirror({ id, children, ...props }: RebootProseMirrorProps) {
         console.error(`Failed to get doc from authority: ${aborted.error}`);
       }
     })();
-  });
+  }, []);
 
   const defaultState = useMemo(() => {
     if (!doc) return undefined;
