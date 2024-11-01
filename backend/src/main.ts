@@ -11,7 +11,7 @@ import {
   CreateResponse,
   ChangesRequest,
   ChangesResponse
-} from "../../api/rbt/thirdparty/prosemirror//v1/authority_rbt.js";
+} from "../../api/reboot_prosemirror//v1/authority_rbt.js";
 import { SCHEMA, INITIAL_DOC, DOC_ID } from "../../constants.js";
 
 

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package rbt.thirdparty.prosemirror.v1;
+package reboot_prosemirror.v1;
 
 import "google/protobuf/struct.proto";
 import "rbt/v1alpha1/options.proto";

@@ -5,7 +5,7 @@ import { Node } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 import { Step } from "prosemirror-transform"
 import { ReactNode, useEffect, useMemo, useState } from "react";
-import { CreateResponse, useAuthority } from "./api/rbt/thirdparty/prosemirror/v1/authority_rbt_react";
+import { CreateResponse, useAuthority } from "./api/reboot_prosemirror/v1/authority_rbt_react";
 import { SCHEMA, DOC_ID } from "../../constants";
 
 function RebootProseMirrorAdaptor({ children }: { children: ReactNode }) {
