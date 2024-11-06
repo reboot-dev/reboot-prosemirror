@@ -6,4 +6,4 @@
 
 (1) `npm install`
 
-(2) `npm run dev:backend` in one terminal and `npm run dev:web` in another terminal.
+(2) `npm run dev:backend` in one terminal, `cd reboot && tsc --watch` in a second, and `npm run dev:web` in a third.

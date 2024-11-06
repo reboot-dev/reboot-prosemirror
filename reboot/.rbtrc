@@ -29,10 +29,7 @@ protoc --nodejs=api
 protoc --react=web/src/api
 
 # Watch if any generated or source files are modified.
-dev run --watch=constants.ts --watch=backend/**/*.ts
-
-# Use the TypeScript compiler to transpile the application.
-dev run --transpile='tsc'
+dev run --watch=dist
 
 # Tell `rbt` that this is a Node.js application.
 dev run --nodejs
