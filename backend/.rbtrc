@@ -21,17 +21,17 @@
 # rbt subcommand --config=use-foo`                                     #
 ########################################################################
 
-# Find '.proto' files in 'api/'.
-protoc api/
+# Find '.proto' files in '../api/'.
+protoc ../api
 
 # Tell `rbt protoc` where to put generated files.
-protoc --nodejs=api
-protoc --react=web/src/api
+protoc --nodejs=../api
+protoc --react=../api
 
 # Watch if any generated or source files are modified.
-dev run --watch=constants.ts --watch=backend/**/*.ts
+dev run --watch=../common/**/*.ts --watch=**/*.ts
 
-dev run --transpile='npx tsc'
+dev run --transpile='node ./esbuild.js'
 
 # Tell `rbt` that this is a Node.js application.
 dev run --nodejs
@@ -40,7 +40,7 @@ dev run --nodejs
 dev run --name=docs
 
 # Run the application!
-dev run --application=dist/backend/src/main.js
+dev run --application=bundle.js
 
 # Use the same name to expunge that we do to run.
 dev expunge --name=docs

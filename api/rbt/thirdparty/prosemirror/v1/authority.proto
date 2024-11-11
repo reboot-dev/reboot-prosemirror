@@ -7,7 +7,7 @@ import "rbt/v1alpha1/options.proto";
 
 ////////////////////////////////////////////////////////////////////////
 
-service AuthorityInterface {
+service AuthorityMethods {
   rpc Create(CreateRequest) returns (CreateResponse) {
     option (rbt.v1alpha1.method).writer = {};
   }

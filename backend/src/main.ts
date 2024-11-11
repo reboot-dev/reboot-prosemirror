@@ -11,11 +11,10 @@ import {
   CreateResponse,
   ChangesRequest,
   ChangesResponse
-} from "../../api/rbt/thirdparty/prosemirror//v1/authority_rbt.js";
-import { SCHEMA, INITIAL_DOC, DOC_ID } from "../../constants.js";
+} from "@monorepo/api/rbt/thirdparty/prosemirror/v1/authority_rbt.js";
+import { SCHEMA, INITIAL_DOC, DOC_ID } from "@monorepo/common/constants.js";
 
-
-export class AuthorityServicer extends Authority.Interface {
+export class AuthorityServicer extends Authority.Servicer {
 
   #docs: { [key: string]: [number, Node] };
 
