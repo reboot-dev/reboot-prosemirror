@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import esbuild from "esbuild";
 import { nodeExternalsPlugin } from "esbuild-node-externals";
 

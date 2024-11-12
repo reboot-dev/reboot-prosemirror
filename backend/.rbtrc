@@ -35,7 +35,7 @@ protoc --react-extensionless
 # Watch if any generated or source files are modified.
 dev run --watch=../common/**/*.ts --watch=**/*.ts
 
-dev run --transpile='node ./esbuild.js'
+dev run --transpile=./esbuild.js
 
 # Tell `rbt` that this is a Node.js application.
 dev run --nodejs
