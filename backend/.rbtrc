@@ -28,6 +28,8 @@ protoc ../api
 protoc --nodejs=../api
 protoc --react=../api
 
+protoc --react-extensionless
+
 # Watch if any generated or source files are modified.
 dev run --watch=../common/**/*.ts --watch=**/*.ts
 
