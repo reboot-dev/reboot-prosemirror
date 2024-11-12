@@ -1,4 +1,5 @@
-import AppProvider from "./AppProvider";
+import { RebootClientProvider } from "@reboot-dev/reboot-react";
+import client from "./client";
 
 export default function RootLayout({
   children,
@@ -8,7 +9,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AppProvider>{children}</AppProvider>
+        <RebootClientProvider client={client}>{children}</RebootClientProvider>
       </body>
     </html>
   );
