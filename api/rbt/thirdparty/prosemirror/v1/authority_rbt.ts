@@ -5,9 +5,9 @@ import { reboot_native, createError } from "@reboot-dev/reboot";
 
 
 import {
+  Value, 
   Struct, 
-  ListValue, 
-  Value
+  ListValue
 } from "@bufbuild/protobuf";
 import {
   Change,

@@ -10,8 +10,8 @@ import type {
 } from "@bufbuild/protobuf";
 import {
   Struct, 
-	ListValue, 
-	Value
+	Value, 
+	ListValue
 } from "@bufbuild/protobuf";
 import * as reboot_react from "@reboot-dev/reboot-react";
 import * as reboot_api from "@reboot-dev/reboot-api";

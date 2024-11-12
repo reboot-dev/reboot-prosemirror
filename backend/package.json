@@ -12,7 +12,7 @@
     "@bufbuild/protoplugin": "1.3.2",
     "@monorepo/api": "workspace:*",
     "@monorepo/common": "workspace:*",
-    "@reboot-dev/reboot": "0.18.1",
+    "@reboot-dev/reboot": "0.18.2",
     "esbuild": "^0.24.0",
     "esbuild-node-externals": "^1.15.0",
     "prosemirror-model": "^1.23.0",
