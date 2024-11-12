@@ -10,11 +10,11 @@ import { ReactNode, useEffect, useMemo, useState } from "react";
 import { useAuthority } from "@monorepo/api/rbt/thirdparty/prosemirror/v1/authority_rbt_react";
 import { SCHEMA, DOC_ID } from "@monorepo/common/constants";
 
-function RebootProseMirrorAdaptor({ children }: { children: ReactNode }) {
+function RebootProseMirrorAdaptor({ id, children }: { id: string; children: ReactNode }) {
   // NOTE: while we could also drill `authority` in as a prop the
   // Reboot React library and generated code will ensure there is only
   // one instance of `authority` so it's not actually necessary.
-  const authority = useAuthority({ id: DOC_ID });
+  const authority = useAuthority({ id });
 
   // In order to send steps to the server (authority) we reactively
   // watch for updates to the state to see if we have anything
@@ -62,20 +62,22 @@ function RebootProseMirrorAdaptor({ children }: { children: ReactNode }) {
       const unappliedChanges = changes.slice(getVersion(view.state) - version);
 
       if (unappliedChanges.length > 0) {
-        // TODO: calling `view.dispatch()` here seems to cause
-        // 'Warning: flushSync was called from inside a lifecycle method';
-        // what is the correct way to do this within the
-        // 'react-prosemirror' library?
-        view.dispatch(
-          receiveTransaction(
-            view.state,
-            unappliedChanges.map(
-              ({ step }) => Step.fromJSON(SCHEMA, step?.toJson())
-            ),
-            unappliedChanges.map(({ client }) => Number(client))
-          )
-        );
-        setSinceVersion(getVersion(view.state));
+        // NOTE: need to use a microtask here via
+        // `Promise.resolve().then()` so that we can call
+        // `view.dispatch()` which calls `flushSync` which can not be
+        // called from within a React lifecycle hook like `useEffect`.
+        Promise.resolve().then(() => {
+          view.dispatch(
+            receiveTransaction(
+              view.state,
+              unappliedChanges.map(
+                ({ step }) => Step.fromJSON(SCHEMA, step?.toJson())
+              ),
+              unappliedChanges.map(({ client }) => Number(client))
+            )
+          );
+          setSinceVersion(getVersion(view.state));
+        });
       }
     }
   }, [response]);
@@ -137,7 +139,7 @@ export default function RebootProseMirror({ id, children, ...props }: RebootPros
   return (
     <>
       <ProseMirror defaultState={defaultState} {...props}>
-        <RebootProseMirrorAdaptor>
+        <RebootProseMirrorAdaptor id={id}>
           {children}
         </RebootProseMirrorAdaptor>
       </ProseMirror>
