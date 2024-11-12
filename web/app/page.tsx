@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import RebootProseMirror from "./RebootProsemirror";
+import { useState } from "react";
+import RebootProseMirror from "./RebootProseMirror";
 import { DOC_ID } from "@monorepo/common/constants";
 
 

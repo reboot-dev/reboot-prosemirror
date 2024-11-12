@@ -1,4 +1,4 @@
-import RebootContext from "./RebootContext.js";
+import AppProvider from "./AppProvider";
 
 export default function RootLayout({
   children,
@@ -8,7 +8,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <RebootContext>{children}</RebootContext>
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );

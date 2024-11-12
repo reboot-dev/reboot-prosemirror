@@ -28,8 +28,6 @@ protoc ../api
 protoc --nodejs=../api
 protoc --react=../api
 
-protoc --react-extensionless
-
 # Watch if any generated or source files are modified.
 dev run --watch=../common/**/*.ts --watch=**/*.ts
 
@@ -42,7 +40,7 @@ dev run --nodejs
 dev run --name=docs
 
 # Run the application!
-dev run --application=bundle.js
+dev run --application=./dist/bundle.js
 
 # Use the same name to expunge that we do to run.
 dev expunge --name=docs

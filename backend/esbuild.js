@@ -7,6 +7,6 @@ esbuild.build({
   platform: "node",
   format: "esm",
   sourcemap: "inline",
-  outfile: "bundle.js",
+  outfile: "./dist/bundle.js",
   plugins: [nodeExternalsPlugin({ allowWorkspaces: true })],
 });
