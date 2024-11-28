@@ -1,22 +1,20 @@
 import { PartialMessage, Struct } from "@bufbuild/protobuf";
-import { Application, ReaderContext, WriterContext } from "@reboot-dev/reboot";
-import { FailedPrecondition, InvalidArgument } from "@reboot-dev/reboot-api/errors_pb.js";
-import { Node } from "prosemirror-model";
-import { Step } from "prosemirror-transform"
 import {
   ApplyRequest,
   ApplyResponse,
   Authority,
+  ChangesRequest,
+  ChangesResponse,
   CreateRequest,
   CreateResponse,
-  ChangesRequest,
-  ChangesResponse
-} from "../../api/rbt/thirdparty/prosemirror//v1/authority_rbt.js";
-import { SCHEMA, INITIAL_DOC, DOC_ID } from "../../constants.js";
+} from "@monorepo/api/rbt/thirdparty/prosemirror/v1/authority_rbt";
+import { DOC_ID, INITIAL_DOC, SCHEMA } from "@monorepo/common/constants";
+import { Application, ReaderContext, WriterContext } from "@reboot-dev/reboot";
+import { errors_pb } from "@reboot-dev/reboot-api";
+import { Node } from "prosemirror-model";
+import { Step } from "prosemirror-transform";
 
-
-export class AuthorityServicer extends Authority.Interface {
-
+export class AuthorityServicer extends Authority.Servicer {
   #docs: { [key: string]: [number, Node] };
 
   constructor() {
@@ -30,14 +28,13 @@ export class AuthorityServicer extends Authority.Interface {
     // hydrated.
     //
     // TODO: do something better than `INITIAL_DOC`?
-    let [version, doc] = stateId in this.#docs
-      ? this.#docs[stateId]
-      : [0, INITIAL_DOC];
+    let [version, doc] =
+      stateId in this.#docs ? this.#docs[stateId] : [0, INITIAL_DOC];
 
     if (version < state.changes.length) {
-      const steps = state.changes.slice(version).map(
-        ({ step }) => Step.fromJSON(SCHEMA, step.toJson())
-      );
+      const steps = state.changes
+        .slice(version)
+        .map(({ step }) => Step.fromJSON(SCHEMA, step.toJson()));
 
       for (const step of steps) {
         doc = step.apply(doc).doc;
@@ -57,7 +54,7 @@ export class AuthorityServicer extends Authority.Interface {
   ): Promise<PartialMessage<CreateResponse>> {
     return {
       doc: Struct.fromJson(this.doc(context.stateId, state).toJSON()),
-      version: state.changes.length
+      version: state.changes.length,
     };
   }
 
@@ -67,7 +64,7 @@ export class AuthorityServicer extends Authority.Interface {
     request: ApplyRequest
   ): Promise<PartialMessage<ApplyResponse>> {
     if (request.version != state.changes.length) {
-      throw new Authority.ApplyAborted(new FailedPrecondition());
+      throw new Authority.ApplyAborted(new errors_pb.FailedPrecondition());
     }
 
     // Validate that we can apply these changes!
@@ -79,8 +76,8 @@ export class AuthorityServicer extends Authority.Interface {
     // that captures that explicitly.
     let doc = this.doc(context.stateId, state);
 
-    const steps = request.changes.map(
-      ({ step }) => Step.fromJSON(SCHEMA, step.toJson())
+    const steps = request.changes.map(({ step }) =>
+      Step.fromJSON(SCHEMA, step.toJson())
     );
 
     for (const step of steps) {
@@ -105,12 +102,12 @@ export class AuthorityServicer extends Authority.Interface {
     { sinceVersion }: ChangesRequest
   ): Promise<PartialMessage<ChangesResponse>> {
     if (sinceVersion > state.changes.length) {
-      throw new Authority.ChangesAborted(new InvalidArgument());
+      throw new Authority.ChangesAborted(new errors_pb.InvalidArgument());
     }
-    
+
     return {
       version: sinceVersion,
-      changes: state.changes.slice(sinceVersion)
+      changes: state.changes.slice(sinceVersion),
     };
   }
 }
