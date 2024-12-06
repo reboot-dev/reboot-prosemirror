@@ -35,7 +35,7 @@ dev run --nodejs
 dev run --name=docs
 
 # Run the application!
-dev run --application=./src/main.ts
+dev run --application=src/main.ts
 
 # Use the same name to expunge that we do to run.
 dev expunge --name=docs
