@@ -65,7 +65,7 @@ message ApplyResponse {}
 ////////////////////////////////////////////////////////////////////////
 
 message ChangesRequest {
-  uint32 sinceVersion = 1;
+  uint32 since_version = 1;
 }
 
 message ChangesResponse {
