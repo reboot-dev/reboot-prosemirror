@@ -10,7 +10,7 @@ export default async function Home() {
   });
 
   // Get initial state here from the backend.
-  const { version, doc } = await Authority.lookup(DOC_ID).create(context);
+  const { version, doc } = await Authority.ref(DOC_ID).create(context);
   return (
     <>
       <ExampleRebootProseMirrorComponent
