@@ -113,7 +113,8 @@ export class AuthorityServicer extends Authority.Servicer {
 }
 
 const initialize = async (context) => {
-  await Authority.construct({ id: DOC_ID }).idempotently().create(context);
+  // Ensure the doc has been constructed implicitly.
+  await Authority.ref(DOC_ID).idempotently().create(context);
 };
 
 new Application({ servicers: [AuthorityServicer], initialize }).run();
