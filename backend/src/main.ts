@@ -9,7 +9,12 @@ import {
   CreateResponse,
 } from "@monorepo/api/rbt/thirdparty/prosemirror/v1/authority_rbt";
 import { DOC_ID, INITIAL_DOC, SCHEMA } from "@monorepo/common/constants";
-import { Application, ReaderContext, WriterContext } from "@reboot-dev/reboot";
+import {
+  Application,
+  ReaderContext,
+  WriterContext,
+  allow,
+} from "@reboot-dev/reboot";
 import { errors_pb } from "@reboot-dev/reboot-api";
 import { Node } from "prosemirror-model";
 import { Step } from "prosemirror-transform";
@@ -20,6 +25,10 @@ export class AuthorityServicer extends Authority.Servicer {
   constructor() {
     super();
     this.#docs = {};
+  }
+
+  authorizer() {
+    return allow();
   }
 
   private doc(stateId: string, state: Authority.State) {
