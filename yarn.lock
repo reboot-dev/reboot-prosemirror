@@ -533,8 +533,8 @@ __metadata:
   dependencies:
     "@monorepo/api": "workspace:*"
     "@monorepo/common": "workspace:*"
-    "@reboot-dev/reboot": "npm:0.25.1"
-    "@reboot-dev/reboot-api": "npm:0.25.1"
+    "@reboot-dev/reboot": "npm:0.25.2"
+    "@reboot-dev/reboot-api": "npm:0.25.2"
     prosemirror-model: "npm:^1.23.0"
     prosemirror-transform: "npm:^1.1.0"
   languageName: unknown
@@ -558,7 +558,7 @@ __metadata:
     "@monorepo/api": "workspace:*"
     "@monorepo/common": "workspace:*"
     "@nytimes/react-prosemirror": "npm:^0.6.2"
-    "@reboot-dev/reboot-react": "npm:0.25.1"
+    "@reboot-dev/reboot-react": "npm:0.25.2"
     "@types/node": "npm:^20"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
@@ -727,21 +727,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reboot-dev/reboot-api@npm:0.25.1":
-  version: 0.25.1
-  resolution: "@reboot-dev/reboot-api@npm:0.25.1"
+"@reboot-dev/reboot-api@npm:0.25.2":
+  version: 0.25.2
+  resolution: "@reboot-dev/reboot-api@npm:0.25.2"
   dependencies:
     "@bufbuild/protobuf": "npm:1.3.2"
-  checksum: 10c0/259396b96e06152a80672aacdbfe340c60d458e722a852ece6ca60b40d1ca14e0a16efda891559c25d35a0bd79f502a7d0c5022cf3033182142332cf63d52f67
+  checksum: 10c0/f964845bac6349c26d6d7ec95ef567971d35719b84494b2675f28e642d1d9a9e63b45f4aac91abf34e90f1f65f59b464fda68dc1e15b80480216458d9b6c619a
   languageName: node
   linkType: hard
 
-"@reboot-dev/reboot-react@npm:0.25.1":
-  version: 0.25.1
-  resolution: "@reboot-dev/reboot-react@npm:0.25.1"
+"@reboot-dev/reboot-react@npm:0.25.2":
+  version: 0.25.2
+  resolution: "@reboot-dev/reboot-react@npm:0.25.2"
   dependencies:
     "@bufbuild/protobuf": "npm:1.3.2"
-    "@reboot-dev/reboot-api": "npm:0.25.1"
+    "@reboot-dev/reboot-api": "npm:0.25.2"
     "@types/react": "npm:^18.2.22"
     "@types/uuid": "npm:^9.0.4"
     js-sha1: "npm:0.7.0"
@@ -749,18 +749,18 @@ __metadata:
     tslib: "npm:^2.6.2"
     typescript: "npm:4.8.4"
     uuid: "npm:^9.0.1"
-  checksum: 10c0/e53c067ee6ae8f3a6a717d75ff8dcc90d0896c58457491f62bb29dee65f78a25a5439d986a13f6e81abed0186168de4b4281a3361064fe51fa16bbd212be7bd8
+  checksum: 10c0/dc970843abe356df69265a3d12fa7dee266d6bce8a9c3e8885b56ed0cebbcf478d0e2f7b8f6b4ed02c25e178ff0076fe1e6136d11c8ff7d6c035bbdfd1e76045
   languageName: node
   linkType: hard
 
-"@reboot-dev/reboot@npm:0.25.1":
-  version: 0.25.1
-  resolution: "@reboot-dev/reboot@npm:0.25.1"
+"@reboot-dev/reboot@npm:0.25.2":
+  version: 0.25.2
+  resolution: "@reboot-dev/reboot@npm:0.25.2"
   dependencies:
     "@bufbuild/protobuf": "npm:1.3.2"
     "@bufbuild/protoc-gen-es": "npm:1.3.2"
     "@bufbuild/protoplugin": "npm:1.3.2"
-    "@reboot-dev/reboot-api": "npm:0.25.1"
+    "@reboot-dev/reboot-api": "npm:0.25.2"
     chalk: "npm:^4.1.2"
     esbuild: "npm:^0.24.0"
     express: "npm:^5.1.0"
@@ -773,7 +773,7 @@ __metadata:
     protoc-gen-es: protoc-gen-es.js
     rbt: rbt.js
     rbt-esbuild: rbt-esbuild.js
-  checksum: 10c0/984189e0b48a235828e92cbb2815505fb956afbfb0ad0becf8066df28ac83e12c156a24e4054b4e998a275621d119195321ac17ce51a84d1e9c9c7eca820a1c0
+  checksum: 10c0/7d6dfb988351182b6c2fdf60cdafec63d45ab5346dfd05d3833eabdb635835b3c357c3438762c650bf4c1b52fe10d8abde038ac1aa524ddea266fdf5366e77e7
   languageName: node
   linkType: hard
 
