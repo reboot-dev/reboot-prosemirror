@@ -39,3 +39,20 @@ dev run --application=src/main.ts
 
 # Use the same name to expunge that we do to run.
 dev expunge --name=docs
+
+serve run --name=docs
+
+# Tell `rbt serve` that this is a Node.js application.
+serve run --nodejs
+
+# The number of partitions of our data to create. Each partition runs as a
+# separate process, and so increasing the partition count requires more
+# cores but also allows the application to use more cores.
+serve run --partitions=4
+
+# Leave TLS termination to the external load balancer; expose a non-SSL port to
+# that loadbalancer.
+serve run --tls=external
+
+# Run the application!
+serve run --application=src/main.ts
