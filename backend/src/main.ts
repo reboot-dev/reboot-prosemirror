@@ -78,7 +78,7 @@ export class AuthorityServicer extends Authority.Servicer {
 
     // Validate that we can apply these changes!
     //
-    // TODO: emperical results show that if we could
+    // TODO: empirical results show that if we could
     // not in fact apply the changes we'll raise an error
     // and thus not persist any updates to `state`,
     // however, it would be great to propagate an error
