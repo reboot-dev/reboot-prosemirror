@@ -13,7 +13,8 @@ if [[ -n "$REBOOT_NPM_PACKAGE" ]]; then
     "resolutions": {
       "@reboot-dev/reboot": "${SANDBOX_ROOT}$REBOOT_NPM_PACKAGE",
       "@reboot-dev/reboot-api": "${SANDBOX_ROOT}$REBOOT_API_NPM_PACKAGE",
-      "@reboot-dev/reboot-react": "${SANDBOX_ROOT}$REBOOT_REACT_NPM_PACKAGE"
+      "@reboot-dev/reboot-react": "${SANDBOX_ROOT}$REBOOT_REACT_NPM_PACKAGE",
+      "@reboot-dev/reboot-web": "${SANDBOX_ROOT}$REBOOT_WEB_NPM_PACKAGE",
     }
   }
 EOF
