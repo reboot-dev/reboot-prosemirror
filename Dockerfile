@@ -1,4 +1,4 @@
-FROM ghcr.io/reboot-dev/reboot-base:0.26.0
+FROM ghcr.io/reboot-dev/reboot-base:0.27.1
 ENV TINI_VERSION=v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
