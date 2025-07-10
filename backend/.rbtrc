@@ -22,11 +22,11 @@
 ########################################################################
 
 # Find '.proto' files in '../api/'.
-protoc ../api
+generate ../api
 
-# Tell `rbt protoc` where to put generated files.
-protoc --nodejs=../api
-protoc --react=../api
+# Tell `rbt generate` where to put generated files.
+generate --nodejs=../api
+generate --react=../api
 
 # Tell `rbt` that this is a Node.js application.
 dev run --nodejs
