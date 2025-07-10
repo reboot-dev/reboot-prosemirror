@@ -1,7 +1,4 @@
-FROM ghcr.io/reboot-dev/reboot-base:0.28.0
-ENV TINI_VERSION=v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
+FROM ghcr.io/reboot-dev/reboot-base:0.29.1
 
 WORKDIR /app
 
@@ -25,9 +22,9 @@ COPY .yarnrc.yml .yarnrc.yml
 RUN yarn install
 
 # Run the Reboot code generators. We did copy all of `api/`, possibly
-# including generated code, but it's not certain that `rbt protoc` was run in
+# including generated code, but it's not certain that `rbt generate` was run in
 # that folder before this build was started.
-RUN cd backend && yarn run rbt protoc
+RUN cd backend && yarn run rbt generate
 
 COPY common/constants.ts common/constants.ts
 COPY backend/src/main.ts backend/src/main.ts
@@ -36,4 +33,4 @@ WORKDIR /app/backend
 
 COPY entrypoint.sh entrypoint.sh
 
-ENTRYPOINT ["/tini", "--", "./entrypoint.sh"]
+CMD ["./entrypoint.sh"]
