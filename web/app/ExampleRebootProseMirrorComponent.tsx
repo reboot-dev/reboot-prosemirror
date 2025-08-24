@@ -10,7 +10,7 @@ export default function ExampleRebootProseMirrorComponent({
   doc,
 }: {
   version: number;
-  doc: JsonValue | undefined;
+  doc: JsonValue;
 }) {
   const [mount, setMount] = useState<HTMLElement | null>(null);
 
