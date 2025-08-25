@@ -9,7 +9,7 @@ import "rbt/v1alpha1/options.proto";
 
 service AuthorityMethods {
   rpc Create(CreateRequest) returns (CreateResponse) {
-    option (rbt.v1alpha1.method).writer = {
+    option (rbt.v1alpha1.method).transaction = {
     };
   }
 
@@ -22,6 +22,11 @@ service AuthorityMethods {
     option (rbt.v1alpha1.method).reader = {
     };
   }
+
+  rpc Checkpoint(CheckpointRequest) returns (CheckpointResponse) {
+    option (rbt.v1alpha1.method).workflow = {
+    };
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -30,6 +35,7 @@ message Authority {
   option (rbt.v1alpha1.state) = {
   };
   repeated Change changes = 1;
+  uint32 version = 2;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,5 +78,11 @@ message ChangesResponse {
   uint32 version = 1;
   repeated Change changes = 2;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+message CheckpointRequest {}
+
+message CheckpointResponse {}
 
 ////////////////////////////////////////////////////////////////////////

@@ -13,10 +13,7 @@ export default async function Home() {
   const { version, doc } = await Authority.ref(DOC_ID).create(context);
   return (
     <>
-      <ExampleRebootProseMirrorComponent
-        version={version}
-        doc={doc?.toJson()}
-      />
+      <ExampleRebootProseMirrorComponent version={version} doc={doc.toJson()} />
     </>
   );
 }
