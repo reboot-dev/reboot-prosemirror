@@ -24,9 +24,13 @@ import {
   until,
 } from "@reboot-dev/reboot";
 import { assert, errors_pb } from "@reboot-dev/reboot-api";
+import sortedMap, { SortedMap } from "@reboot-dev/reboot-std/index/v1"
 import { Node } from "prosemirror-model";
 import { Step } from "prosemirror-transform";
 import { z } from "zod/v4";
+
+const Change = z.object({ step: z.json(), client: z.string() });
+const Changes = z.array(Changes);
 
 export class CheckpointServicer extends Checkpoint.Servicer {
   authorizer() {
@@ -59,6 +63,17 @@ export class CheckpointServicer extends Checkpoint.Servicer {
     this.state.version += request.changes.length;
   }
 }
+
+// TODO: remove after `OrderedMap` is released and we switch to it.
+const encode = (change: z.infer<typeof Change>): Uint8Array => {
+  return new TextEncoder().encode(JSON.stringify(change));
+};
+
+const decode = (bytes: Uint8Array): z.infer<typeof Change> => {
+  return JSON.parse(
+    new TextDecoder().decode(bytes)
+  ) as z.infer<typeof Change>;
+};
 
 export class AuthorityServicer extends Authority.Servicer {
   #cache?: { version: number; doc: Node };
@@ -154,14 +169,25 @@ export class AuthorityServicer extends Authority.Servicer {
     context: ReaderContext,
     { sinceVersion }: ChangesRequest
   ): Promise<PartialMessage<ChangesResponse>> {
-    // Invariant is that caller should have first called `create` and
-    // thus will never as for a version less than `this.state.version`
-    // nor should they ever ask for a version that is past the last
-    // step we have recorded.
-    if (
-      sinceVersion < this.state.version ||
-      sinceVersion > this.state.version + this.state.changes.length
-    ) {
+    // If the caller asks for a version less than what we have as part
+    // of this state, go out to the `SortedMap` and get what they need.
+    if (sinceVersion < this.state.version) {
+      // TODO: support just sending the current doc if the number of
+      // changes they need is greater than some value, e.g., 1000.
+      const { entries } = await this.#changes.range(context, {
+        startKey: sinceVersion.toString(),
+        limit: this.state.version - sinceVersion,
+      });
+
+      const changes = entries.map(({ value }) => decode(value));
+
+      return {
+        version: sinceVersion,
+        changes: [...changes, ...this.state.changes];
+      };
+    }
+
+    if (sinceVersion > this.state.version + this.state.changes.length) {
       throw new Authority.ChangesAborted(new errors_pb.InvalidArgument());
     }
 
@@ -172,36 +198,48 @@ export class AuthorityServicer extends Authority.Servicer {
   }
 
   async checkpoint(context: WorkflowContext, request: CheckpointRequest) {
-    // Schema for validating result of `until` below.
-    const Changes = z.array(z.object({ step: z.json(), client: z.string() }));
-
     // Control loop which checkpoints after accumulating 100 changes.
     for await (const iteration of context.loop("checkpoint")) {
-      const changes = await until(
+      let { changes, version } = await until(
         `At least 100 changes accumulated`,
         context,
         async () => {
           const { changes, version } = await this.ref().read(context);
           return (
-            changes.length >= 100 && changes.map((change) => change.toJson())
+            changes.length >= 100 && {
+              changes: changes.map((change) => change.toJson()),
+              version,
+            }
           );
         },
-        { schema: Changes }
+        { schema: z.object({ changes: Changes, version: z.number() }) }
       );
 
-      // 1. Apply the steps to the checkpoint. We need to do this
+      // TODO: remove once `toJson()`/`fromJson()` is not necessary.
+      changes = changes.map(({ step, client }) => ({
+        step: Struct.fromJson(step),
+        client,
+      }));
+
+      // 1. Save the changes out to a `SortedMap` so that we can
+      // still send just steps to clients that are behind.
+      //
+      // TODO: replace with `OrderedMap` which has better API.
+      const entries = {};
+      for (const change of changes) {
+        entries[version.toString()] = encode(change);
+        version += 1;
+      }
+      await this.#changes.insert(context, { entries });
+
+      // 2. Apply the steps to the checkpoint. We need to do this
       // first so that if we get rebooted before 2. we'll just fetch
       // the latest checkpoint and apply only the relevant changes (if
       // any) from `state.changes`. Alternatively we could update
       // `state` and update the checkpoint in a transaction.
-      await this.#checkpoint.update(context, {
-        changes: changes.map(({ step, client }) => ({
-          step: Struct.fromJson(step),
-          client,
-        })),
-      });
+      await this.#checkpoint.update(context, { changes });
 
-      // 2. Truncate the changes and update the version.
+      // 3. Truncate the changes and update the version.
       await this.ref().write(context, async (state) => {
         state.changes = state.changes.slice(changes.length);
         state.version += changes.length;
@@ -214,6 +252,12 @@ export class AuthorityServicer extends Authority.Servicer {
     // as this instance of `Authority`.
     return Checkpoint.ref(this.ref().stateId);
   }
+
+  get #changes() {
+    // Using relative naming here, `SortedMap` instance has same name
+    // as this instance of `Authority`.
+    return SortedMap.ref(this.ref().stateId);
+  }
 }
 
 const initialize = async (context) => {
@@ -222,6 +266,6 @@ const initialize = async (context) => {
 };
 
 new Application({
-  servicers: [AuthorityServicer, CheckpointServicer],
+  servicers: [AuthorityServicer, CheckpointServicer, ...sortedMap.servicers()],
   initialize,
 }).run();
