@@ -171,7 +171,10 @@ export class AuthorityServicer extends Authority.Servicer {
     };
   }
 
-  async checkpoint(context: WorkflowContext, request: CheckpointRequest) {
+  static async checkpoint(
+    context: WorkflowContext,
+    request: CheckpointRequest
+  ) {
     // Schema for validating result of `until` below.
     const Changes = z.array(z.object({ step: z.json(), client: z.string() }));
 
@@ -181,7 +184,7 @@ export class AuthorityServicer extends Authority.Servicer {
         `At least 100 changes accumulated`,
         context,
         async () => {
-          const { changes, version } = await this.ref().read(context);
+          const { changes, version } = await Authority.ref().read(context);
           return (
             changes.length >= 100 && changes.map((change) => change.toJson())
           );
@@ -194,7 +197,7 @@ export class AuthorityServicer extends Authority.Servicer {
       // the latest checkpoint and apply only the relevant changes (if
       // any) from `state.changes`. Alternatively we could update
       // `state` and update the checkpoint in a transaction.
-      await this.#checkpoint.update(context, {
+      await Checkpoint.ref().update(context, {
         changes: changes.map(({ step, client }) => ({
           step: Struct.fromJson(step),
           client,
@@ -202,7 +205,7 @@ export class AuthorityServicer extends Authority.Servicer {
       });
 
       // 2. Truncate the changes and update the version.
-      await this.ref().write(context, async (state) => {
+      await Authority.ref().write(context, async (state) => {
         state.changes = state.changes.slice(changes.length);
         state.version += changes.length;
       });
